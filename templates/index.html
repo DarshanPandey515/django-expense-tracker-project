@@ -1,0 +1,210 @@
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/tailwindcss@2.2.19/dist/tailwind.min.css" />
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css"
+      rel="stylesheet">
+    <title>Expense Tracker</title>
+</head>
+
+<body>
+
+    <!-- component -->
+    <div class="flex-1 flex flex-col">
+        <nav class="px-4 flex justify-between bg-white h-16 border-b-2">
+
+            <!-- top bar left -->
+            <ul class="flex items-center">
+                <!-- add button -->
+                <li class="h-6 w-6">
+                    <img class="h-full w-full mx-auto"
+                        src="https://dummyimage.com/1000x1000/000/ffffff.png&text=T"
+                        alt="svelte logo" />
+                </li>
+            </ul>
+
+            <ul class="flex items-center">
+                <!-- add button -->
+                <li>
+                    <h1 class="pl-8 lg:pl-0 text-gray-700"><a href="/">Home</a></h1>
+                </li> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <li>
+                    <h1 class="pl-8 lg:pl-0 text-gray-700"><a href="#">About</a></h1>
+                </li> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <li>
+                    <h1 class="pl-8 lg:pl-0 text-gray-700"><a href="{% url 'profile' %}">Profile</a></h1>
+                </li> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <li>
+                    <h1 class="pl-8 lg:pl-0 text-gray-700"><a href="{% url 'logout' %}">Logout</a></h1>
+                </li>
+            </ul>
+
+            <!-- to bar right  -->
+            <ul class="flex items-center">
+
+                <li class="pr-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="feather feather-bell">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+
+                </li>
+                <li class="h-10 w-10">
+                    <img class="h-full w-full rounded-full mx-auto"
+                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60"
+                        alt="profile woman" />
+                </li>
+
+            </ul>
+
+        </nav>
+    </div>
+    <!-- component -->
+    <div class="bg-white">
+        <div class="grid grid-cols-12 gap-0 ">
+            <div class="bg-fixed relative col-span-12 sm:col-span-12 md:col-span-7 lg:col-span-8 xxl:col-span-8 hidden md:block"
+                style="
+            background-image:url('https://i.pinimg.com/originals/74/79/b0/7479b0e55f61567d40b0709a4d1b95d9.gif');
+            background-size: cover;
+            ">
+                <div class="absolute inset-0 z-20 flex items-center justify-center h-full bg-gray-900 bg-opacity-50">
+                    <div class="flex justify-center h-full items-center fixed top-0">
+                        <p class="text-white text-5xl lg:text-7xl">
+                            <span class="border-2 p-4 rounded-md" id="time"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-span-12 sm:col-span-12 md:col-span-5 lg:col-span-4 xxl:col-span-4">
+                <div>
+                    <div class="border-b">
+                        <div class="my-4 px-6">
+                            <h2 class="font-semibold text-2xl">Expense Tracker</h2>
+                        </div>
+                    </div>
+                    <div class="px-8 py-2">
+                        <h4 class="text-lg text-gray-500 font-thin">Your Balance</h4>
+                        <h4 class="text-2xl font-semibold">Rs. {{profile_obj.balance|intcomma}}</h4>
+                    </div>
+                    <div class="flex space-x-0 flex-col lg:flex-row lg:space-x-2 my-2 px-6">
+                        <div class="bg-green-600 p-4 border-2 rounded-md shadow-lg  w-full text-white text-center">
+                            <h1 class="text-xl font-light">INCOME</h1>
+                            <h1 class="text-2xl text-green-100 font-semibold">Rs. {{profile_obj.income|intcomma}}</h1>
+                        </div>
+                        <div class="bg-red-600 p-4 border-2 rounded-md shadow-lg  w-full text-white text-center">
+                            <h1 class="text-xl font-light">EXPENSE</h1>
+                            <h1 class="text-2xl text-red-100 font-semibold">- Rs. {{profile_obj.expense|intcomma}}</h1>
+                        </div>
+                    </div>
+                    <div class="px-8 my-6">
+                        <div class="my-4 border-b w-full">
+                            <h2 class="font-semibold text-lg">History</h2>
+                        </div>
+
+                        {% include 'alert.html' %}
+                        {% for history in page_obj %}
+                        <div class="ml-6 relative bg-white p-4 border-r-8 shadow-md my-4 flex justify-between {% if history.transaction_type == "Negative" %} border-red-500 {% else %} border-green-500 {% endif %}">
+                            <div class="absolute -left-6">
+                                <div
+                                    class="cursor-pointer bg-red-600 p-2 w-6 flex items-center text-xs text-white justify-center">
+                                    x
+                                </div>
+                            </div>
+                            <div>
+                                <p>{{history.transaction_name}}</p>
+                            </div>
+                            <div>
+                                <p>Rs. {% if history.transaction_type == "Negative" %} - {% else %} + {% endif %}
+                                    {{history.amount|intcomma}}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+
+
+                        <!-- Previous Button -->
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}"
+                            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                            Previous
+                        </a>
+                        {% endif %}
+
+                        <!-- Next Button -->
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}"
+                            class="inline-flex items-center px-4 py-2 ml-3 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                            Next
+                        </a>
+                        {% endif %}
+
+
+
+                    </div>
+                    <div class="px-8 my-6">
+                        <div class="my-4 border-b w-full">
+                            <h2 class="font-semibold text-lg">Add new transaction</h2>
+                        </div>
+                        <div class="bg-white p-4 border-2 rounded-md">
+                            <form class="mt-4" action="/" method="POST">
+                                {% csrf_token %}
+                                <div class="my-5 text-sm">
+                                    <label htmlFor="text" class="block text-black">Transaction Name</label>
+                                    {{form.transaction_name}}
+                                </div>
+                                <div class="my-5 text-sm">
+                                    <label htmlFor="amount" class="block text-black">
+                                        Amount
+                                    </label>
+                                    {{form.amount}}
+                                </div>
+                                <div class="my-5 text-sm">
+                                    <label htmlFor="status" class="block text-black">Postive or Negative</label>
+                                    <small class="text-gray-600"> (
+                                        <span class="text-red-400"> negative-expense</span> ,
+                                        <span class="text-green-400"> positive-income</span>
+                                        )
+                                    </small>
+                                    {{form.transaction_type}}
+                                </div>
+                                <div class="my-5">
+                                    <button type="submit"
+                                        class="rounded-sm block text-center text-white bg-gray-800 p-3 duration-300  hover:bg-black w-full">
+                                        Add Transaction
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        const getCurrentTimeDate = () => {
+            let currentTimeDate = new Date();
+            var hours = currentTimeDate.getHours();
+            var minutes = currentTimeDate.getMinutes();
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            var AMPM = hours >= 12 ? 'PM' : 'AM';
+            if (hours === 12) {
+                hours = 12;
+            } else {
+                hours = hours % 12;
+            }
+            var currentTime = `${hours}:${minutes}${AMPM}`;
+            document.getElementById("time").innerHTML = currentTime;
+            setTimeout(getCurrentTimeDate, 500);
+        }
+        getCurrentTimeDate();
+    </script>
+</body>
+
+</html>
